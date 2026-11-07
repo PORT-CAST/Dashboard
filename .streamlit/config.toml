@@ -1,0 +1,26 @@
+[theme]
+base = "light"
+primaryColor = "#F9A657"
+backgroundColor = "#F6F4F3"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#042653"
+borderColor = "#E9E4E2"
+font = "Pretendard, sans-serif"
+
+[[theme.fontFaces]]
+family = "Pretendard"
+url = "app/static/PretendardVariable.woff2"
+weight = "100 900"
+
+[theme.sidebar]
+backgroundColor = "#021D4C"
+secondaryBackgroundColor = "#042653"
+textColor = "#FFFFFF"
+borderColor = "#021D4C"
+
+[server]
+headless = true
+enableStaticServing = true
+
+[browser]
+gatherUsageStats = false
