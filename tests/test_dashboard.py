@@ -131,6 +131,19 @@ class ScreenTests(unittest.TestCase):
             self.app.run()
             self.assertFalse(self.app.exception, variable)
 
+    def test_return_to_check_keeps_settings(self):
+        """다른 화면에 다녀와도 오류 없이 마지막 설정이 유지된다."""
+        self.open_check()
+        self.app.button(key="점검_프리셋_폭풍급").click().run()
+        self.app.toggle(key="점검_특보").set_value(True).run()
+        키 = "점검_체류시간_최대순간풍속_최댓값_mps"
+        전 = self.app.session_state[키]
+        for 화면 in ["KPI 1", "KPI 2", "전체 요약"]:
+            self.app.button(key="메뉴_" + 화면).click().run()
+            self.open_check()
+            self.assertEqual(self.app.session_state[키], 전)
+            self.assertTrue(self.app.session_state["점검_특보"])
+
     def test_presets_and_extreme_inputs(self):
         self.open_check()
         for terminal in kpi.터미널순서:

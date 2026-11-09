@@ -454,8 +454,16 @@ def 점검터미널바꿈() -> None:
 def 조작판(대상: str) -> tuple[dict, bool]:
     """왼쪽 조작판. 슬라이더 값(모형 단위)과 특보 여부를 돌려준다."""
     결과, 표, _ = 보정모형()
-    if _키(models.기상변수[0]) not in st.session_state:
-        프리셋적용(대상, models.기준시나리오)
+    # 다른 화면에 다녀오면 Streamlit이 화면에 없던 위젯(슬라이더·스위치) 값을 지운다.
+    # 마지막 설정을 보관해 두었다가 되살리고, 보관한 값이 없으면 평온 시작점으로 맞춘다.
+    필요 = [_키(v) for v in models.기상변수]
+    if any(k not in st.session_state for k in 필요):
+        보관 = st.session_state.get("점검_보관")
+        if 보관 and all(k in 보관 for k in 필요):
+            for k, 값 in 보관.items():
+                st.session_state[k] = 값
+        else:
+            프리셋적용(대상, models.기준시나리오)
     with st.container(key="console"):
         st.markdown('<p class="console-h">기상 조건 조절</p>'
                     '<p class="console-s">돌풍·최대파고·시정을 정하면 나머지 기상값은 과거 기록으로 예측합니다</p>',
@@ -501,6 +509,8 @@ def 조작판(대상: str) -> tuple[dict, bool]:
                             f'<i>예측값</i></div>', unsafe_allow_html=True)
         st.markdown('<div class="console-g">' + ui.아이콘("warning") + '기상특보</div>', unsafe_allow_html=True)
         특보 = st.toggle("풍랑·태풍 특보 발효 중", key="점검_특보")
+    st.session_state["점검_보관"] = {k: st.session_state[k] for k in
+                                 [_키(v) for v in models.기상변수] + ["점검_세부", "점검_특보"] if k in st.session_state}
     return 값들, 특보
 
 
