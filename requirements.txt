@@ -2,3 +2,4 @@ streamlit==1.67.0
 plotly>=5.24
 pandas>=2.2
 google-genai
+statsmodels>=0.14

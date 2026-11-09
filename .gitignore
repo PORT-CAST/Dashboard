@@ -3,3 +3,6 @@ __pycache__/
 .idea/
 .DS_Store
 .streamlit/secrets.toml
+
+# 분석 CSV 2개(data/)는 Streamlit Cloud 배포를 위해 저장소에 포함한다
+*.xlsx

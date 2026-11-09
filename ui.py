@@ -105,6 +105,7 @@ header[data-testid="stHeader"] {{background:transparent}}
 .tile .chip.alert {{background:#FDE9EB;color:#C43748}}
 .tile .chip.base {{background:#EDF0F6;color:{색['남색']}}}
 .tile .v {{font-size:2.5rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;color:{색['남색']};font-variant-numeric:tabular-nums;margin-top:.1rem}}
+.tile .v.compact {{font-size:1.75rem;white-space:nowrap}}
 .tile .s {{font-size:.76rem;color:{색['보조글자']}}}
 .tile.main {{background:{색['남색']};border-color:{색['남색']}}}
 .tile.main .k {{color:{색['회베이지']}}} .tile.main .s {{color:{색['회베이지']}}} .tile.main .v {{color:#FFFFFF}}
@@ -117,6 +118,52 @@ p.phint {{font-size:.82rem!important;color:{색['보조글자']};margin:.12rem 0
 p.mapnote {{font-size:.74rem!important;color:{색['보조글자']};margin:.5rem 0 0}}
 .slot {{display:flex;flex-direction:column;gap:.45rem;align-items:center;justify-content:center;border-radius:12px;background:{색['연면']};color:{색['보조글자']};font-size:.84rem}}
 .slot .mi {{font-size:30px;color:{색['회베이지']}}}
+
+/* 한글이 단어 중간에서 줄바뀌지 않게 */
+[data-testid="stMarkdownContainer"], [data-testid="stCaptionContainer"], .stAlert, .phint, .ptitle {{word-break:keep-all;overflow-wrap:break-word}}
+
+/* 회귀 모형 설명칸 */
+.modelinfo {{font-size:.84rem;line-height:1.55;color:{색['보조글자']};word-break:keep-all}}
+.modelinfo p {{margin:0 0 .35rem}}
+.modelinfo .mhead {{color:#1B2433;font-size:.9rem}}
+.modelinfo .mstat {{margin-bottom:.9rem;font-variant-numeric:tabular-nums}}
+.modelinfo ul {{list-style:none;margin:0;padding:0;border-top:1px solid {색['선']}}}
+.modelinfo li {{display:flex;gap:1rem;padding:.7rem 0;border-bottom:1px solid {색['선']};margin:0}}
+.modelinfo li:last-child {{border-bottom:0}}
+.modelinfo li b {{flex:0 0 7.5rem;color:#1B2433;font-weight:600}}
+.modelinfo li span {{flex:1}}
+@media (max-width: 720px) {{ .modelinfo li {{flex-direction:column;gap:.15rem}} .modelinfo li b {{flex:none}} }}
+
+/* 기상 상황 점검: 조작판 + 계산식 */
+.st-key-console {{background:{색['남색']};border-radius:18px;padding:1.2rem 1.25rem 1rem}}
+.st-key-console p, .st-key-console label, .st-key-console [data-testid="stWidgetLabel"] p {{color:#E9EDF5 !important}}
+.st-key-console [data-testid="stCaptionContainer"] p {{color:{색['회베이지']} !important;font-size:.74rem}}
+.st-key-console [data-testid="stSliderThumbValue"] p {{color:{색['주황']} !important;font-weight:700;font-size:.86rem}}
+.st-key-console [data-testid="stSliderTickBar"] p {{color:rgba(255,255,255,.45) !important;font-size:.72rem}}
+.st-key-console [data-testid="stSlider"] {{margin-bottom:-.2rem}}
+.st-key-console button {{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.22);min-height:2.1rem;padding:0 .75rem}}
+.st-key-console button p, .st-key-console button span {{color:#E9EDF5 !important;font-size:.84rem}}
+.st-key-console button:hover {{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.4)}}
+.st-key-console button[kind="primary"] {{background:{색['주황']};border-color:{색['주황']}}}
+.st-key-console button[kind="primary"] p, .st-key-console button[kind="primary"] span {{color:{색['진남색']} !important;font-weight:700}}
+.console-h {{color:#FFFFFF;font-size:1.05rem;font-weight:700;margin:0 0 .15rem}}
+.console-s {{color:{색['회베이지']};font-size:.78rem;margin:0 0 .6rem}}
+.console-g {{display:flex;align-items:center;gap:.4rem;color:{색['주황']};font-size:.8rem;font-weight:700;letter-spacing:.02em;
+  margin:.9rem 0 .1rem;padding-top:.7rem;border-top:1px solid rgba(255,255,255,.12)}}
+.console-g .mi {{font-size:18px}}
+.console-p {{display:flex;align-items:baseline;gap:.5rem;background:rgba(255,255,255,.07);border-radius:10px;padding:.5rem .75rem;margin:.1rem 0 .3rem}}
+.console-p span {{color:#C9D2E3;font-size:.84rem;flex:1}}
+.console-p b {{color:#FFFFFF;font-size:1rem;font-variant-numeric:tabular-nums}}
+.console-p i {{font-style:normal;font-size:.7rem;color:{색['진남색']};background:{색['회베이지']};border-radius:6px;padding:.05rem .4rem}}
+.eqn {{display:flex;align-items:stretch;gap:.6rem;flex-wrap:wrap;margin:.2rem 0 .9rem}}
+.eqn .b {{flex:1 1 140px;background:{색['면']};border:1px solid {색['선']};border-radius:14px;padding:.8rem 1rem}}
+.eqn .b .k {{font-size:.76rem;color:{색['보조글자']}}}
+.eqn .b .v {{font-size:1.75rem;font-weight:700;color:{색['남색']};font-variant-numeric:tabular-nums;line-height:1.25}}
+.eqn .b .s {{font-size:.72rem;color:{색['보조글자']}}}
+.eqn .b.res {{background:{색['남색']};border-color:{색['남색']}}} .eqn .b.res .k, .eqn .b.res .s {{color:{색['회베이지']}}} .eqn .b.res .v {{color:#FFFFFF}}
+.eqn .op {{display:flex;align-items:center;font-size:1.6rem;font-weight:300;color:{색['보조글자']}}}
+.rare {{border-radius:12px;padding:.6rem .9rem;font-size:.82rem;margin:0 0 .8rem;word-break:keep-all}}
+.rare.ok {{background:#EEF3EC;color:#2E5B35}} .rare.warn {{background:#FDF1E3;color:#7A4A0B}}
 
 /* AI 요약칸 */
 .st-key-ai {{background:{색['면']};border:1px solid {색['선']};border-radius:16px;padding:1rem 1.25rem;margin-top:.75rem}}
@@ -169,7 +216,8 @@ def 브랜드(팀이름: str, 프로젝트이름: str) -> None:
 
 
 def 상태표시(글: str) -> None:
-    st.markdown(f'<div class="status"><i></i>{글}</div>', unsafe_allow_html=True)
+    점 = ' style="background:#3BB273"' if "연결됨" in 글 else ""
+    st.markdown(f'<div class="status"><i{점}></i>{글}</div>', unsafe_allow_html=True)
 
 
 def 머리글(제목: str, 설명: str, 범위: str, 기간: str | None = None) -> None:
@@ -186,7 +234,7 @@ def 지표줄(지표들: list[dict]) -> None:
         종류 = 지표.get("종류", "")
         칸.markdown(f"""<div class="tile {'main' if 종류 == 'main' else ''}"><div class="top">
 <div class="k">{지표['이름']}</div><div class="chip {종류}">{아이콘(지표.get('아이콘', 'monitoring'))}</div></div>
-<div class="v">{지표.get('값', '-')}</div><div class="s">{지표.get('보조', '단위')}</div></div>""",
+<div class="v {'compact' if len(str(지표.get('값', '-'))) > 8 else ''}">{지표.get('값', '-')}</div><div class="s">{지표.get('보조', '단위')}</div></div>""",
                    unsafe_allow_html=True)
 
 
@@ -206,6 +254,7 @@ def 빈자리(높이: int = 300, 종류: str = "그래프") -> None:
 def AI요약칸(자료: dict | None = None) -> None:
     자료 = 자료 or {}
     입력 = json.dumps(자료, ensure_ascii=False, sort_keys=True)
+    안내 = "현재 화면의 분석 결과를 요약합니다." if 자료.get("분석결과") else "분석 데이터를 연결하면 요약을 생성할 수 있습니다."
 
     with st.container(key="ai"):
         글, 버튼 = st.columns([6, 1.1], vertical_alignment="center")
@@ -214,7 +263,7 @@ def AI요약칸(자료: dict | None = None) -> None:
             f"""<div class="aihead">
             <div class="chip">{아이콘('auto_awesome')}</div>
             <div><p class="ptitle">AI 요약 · Gemini</p>
-            <p class="phint">현재 화면의 분석 결과를 요약합니다.</p>
+            <p class="phint">{안내}</p>
             </div></div>""",
             unsafe_allow_html=True,
         )
@@ -228,13 +277,20 @@ def AI요약칸(자료: dict | None = None) -> None:
         )
 
         if not 자료.get("분석결과"):
-            st.caption("분석 데이터를 연결하면 요약을 생성할 수 있습니다.")
             return
 
         if 클릭:
-            API키 = st.secrets.get("GEMINI_API_KEY")
+            try:
+                API키 = str(st.secrets.get("GEMINI_API_KEY", "")).strip()
+            except FileNotFoundError:
+                st.error(".streamlit/secrets.toml에 GEMINI_API_KEY를 설정해 주세요.")
+                return
             if not API키:
                 st.error("secrets.toml에 GEMINI_API_KEY를 설정해 주세요. (Google AI Studio에서 무료 발급)")
+                return
+            if not API키.isascii() or "키" in API키 or API키.startswith("sk-"):
+                st.error("secrets.toml의 GEMINI_API_KEY가 예시 문구이거나 한글이 섞여 있습니다. "
+                         "https://aistudio.google.com/apikey 에서 발급받은 키를 그대로 붙여넣어 주세요.")
                 return
 
             # 기본 모델이 막히거나 무료 한도를 넘으면 가벼운 모델로 한 번 더 시도
@@ -269,6 +325,9 @@ def AI요약칸(자료: dict | None = None) -> None:
                         마지막오류 = 오류
                         if 오류.code not in (404, 429, 500, 503):
                             break
+                    except Exception as 오류:  # 네트워크 등 API 밖의 오류도 화면을 멈추지 않게
+                        st.error(f"요약 요청 중 오류가 났습니다: {type(오류).__name__}. 네트워크와 키를 확인해 주세요.")
+                        return
 
             if 요약:
                 st.session_state["AI요약결과"] = {"입력": 입력, "내용": 요약}
@@ -286,10 +345,10 @@ def AI요약칸(자료: dict | None = None) -> None:
             st.markdown(저장결과["내용"])
 
 
-def 상태카드(단계: str, 이유: str) -> None:
+def 상태카드(단계: str, 이유: str, 제목: str = "현재 기상 상황") -> None:
     모양 = {"안정": "check_circle", "주의": "error", "위험": "warning"}[단계]
     st.markdown(f"""<div class="state {단계}" role="status"><div class="ic">{아이콘(모양)}</div>
-<div><div class="sm">현재 기상 상황</div><div class="w">{단계}</div><div class="r">{이유}</div></div></div>""",
+<div><div class="sm">{제목}</div><div class="w">{단계}</div><div class="r">{이유}</div></div></div>""",
                 unsafe_allow_html=True)
 
 
@@ -323,3 +382,29 @@ def 임시기준안내() -> None:
 
 def 지도설명() -> None:
     st.markdown('<p class="mapnote">위치 개념도입니다. 실제 지형과 축척은 다릅니다.</p>', unsafe_allow_html=True)
+
+
+def 계산식(평온: float, 증가: float, 하한: float, 상한: float, 예상: float, 조건: str) -> None:
+    증가, 하한, 상한 = [0.0 if abs(x) < 0.05 else x for x in (증가, 하한, 상한)]   # -0.0 표시 방지
+    st.markdown(f"""<div class="eqn">
+<div class="b"><div class="k">평온일 때 예상</div><div class="v">{평온:.1f}h</div><div class="s">보통 선박 기준</div></div>
+<div class="op">+</div>
+<div class="b"><div class="k">기상 조건에 따른 변화</div><div class="v">{증가:+.1f}h</div><div class="s">95% CI {하한:+.1f} ~ {상한:+.1f}h</div></div>
+<div class="op">=</div>
+<div class="b res"><div class="k">예상 체류시간</div><div class="v">{예상:.1f}h</div><div class="s">{조건}</div></div></div>""",
+                unsafe_allow_html=True)
+
+
+def 드문조합안내(비율: float, 문제들: list[str]) -> None:
+    if 문제들:
+        st.markdown(f'<div class="rare warn">⚠ 물리적으로 맞지 않는 조합: {" · ".join(문제들)}. 결과를 해석하지 마세요.</div>',
+                    unsafe_allow_html=True)
+    elif 비율 < 1:
+        st.markdown(f'<div class="rare warn">⚠ 과거 기록의 {비율:.2f}%만 이보다 극단적인 매우 드문 조합입니다. '
+                    '모형이 거의 본 적 없는 범위라 결과가 부정확할 수 있습니다.</div>', unsafe_allow_html=True)
+    elif 비율 < 5:
+        st.markdown(f'<div class="rare warn">드문 조합입니다 (과거 기록의 {비율:.1f}%만 이보다 극단적). 해석에 주의하세요.</div>',
+                    unsafe_allow_html=True)
+    else:
+        st.markdown(f'<div class="rare ok">과거에 흔히 나타난 범위의 조합입니다 (과거 기록의 {비율:.0f}%가 이보다 극단적).</div>',
+                    unsafe_allow_html=True)

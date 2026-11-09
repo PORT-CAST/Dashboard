@@ -1,0 +1,24 @@
+부산항 대시보드 · EDA 정합성 수정본
+
+1. 압축을 풀고 이 폴더에서 터미널을 여세요.
+2. Python 3.10 이상에서 다음 명령을 실행하세요.
+   python3 -m venv .venv
+   source .venv/bin/activate
+   python -m pip install -r requirements.txt
+   python -m streamlit run app.py
+
+Windows에서는 가상환경 활성화에 .venv\Scripts\activate를 사용하세요.
+
+AI 요약은 Google Gemini를 유지했습니다.
+.streamlit/secrets.toml.example을 같은 폴더의 secrets.toml로 복사한 뒤
+본인의 GEMINI_API_KEY를 넣으세요. 기존 키 파일이 있다면 이 새 폴더로 직접 옮겨도 됩니다.
+키를 설정하지 않아도 KPI·회귀·기상 조작판은 동작합니다.
+실제 Gemini 호출과 계정의 모델 접근 가능 여부는 검증하지 않았습니다.
+
+이 ZIP에는 검증에 쓴 CSV 2개가 data/ 폴더에 포함되어 있습니다.
+원본 코드·노트북·CSV와 기존 Desktop 폴더는 변경하지 않았습니다.
+주요 변경 파일은 app.py, kpi.py, models.py, ui.py, README.md입니다.
+회귀 모형식·표준화·학습기간·계수·공분산 방식은 유지했습니다.
+
+자동 검증:
+   python -m unittest discover -s tests -v
