@@ -94,7 +94,8 @@ def 지도칸() -> None:
 
 KPI1표, KPI2표 = kpi.불러오기()
 있음 = {"KPI1": KPI1표 is not None, "KPI2": KPI2표 is not None}
-st.session_state.setdefault("표본선택", "조건부 표본")
+st.session_state.setdefault("표본선택", kpi.조건부이름[kpi.기본조건부])
+표본키 = {이름: 키 for 키, 이름 in kpi.조건부이름.items()}            # 화면 선택지 → 조건부 키 (전체 표본은 없음)
 st.session_state.setdefault("기상변수선택", "최대순간풍속")
 
 
@@ -108,7 +109,7 @@ def 자료없음(이름: str) -> None:
             icon=":material/folder_open:")
 
 
-def 표본조절(기상변수도: bool) -> tuple[bool, str | None]:
+def 표본조절(기상변수도: bool) -> tuple[str | None, str | None]:
     with st.container(key="kpictl", horizontal=True, horizontal_alignment="distribute"):
         if 기상변수도:
             st.segmented_control("기상변수", list(kpi.기상구간), key="기상변수선택", required=True,
@@ -119,11 +120,15 @@ def 표본조절(기상변수도: bool) -> tuple[bool, str | None]:
             단위 = kpi.기상구간[변수]["단위"]
             st.selectbox("비교 구간", 후보, key=f"비교구간_{변수}", format_func=lambda g: f"{g} {단위}",
                          help="기준 구간과 비교할 구간입니다. 자료가 없는 터미널이 있으면 다른 구간을 골라 보세요.")
-        st.segmented_control("비교 표본", ["조건부 표본", "전체 표본"], key="표본선택", required=True,
-                             help=f"조건부 표본: {kpi.조건부상세}. 선박 규모·작업량 구성 차이를 줄이기 위한 보조 비교입니다.")
-    if st.session_state["표본선택"] == "조건부 표본":
-        st.caption(kpi.조건부상세)
-    return st.session_state["표본선택"] == "조건부 표본", st.session_state.get("기상변수선택")
+        if st.session_state.get("표본선택") not in [*표본키, "전체 표본"]:
+            st.session_state["표본선택"] = kpi.조건부이름[kpi.기본조건부]
+        st.segmented_control("비교 표본", [*표본키, "전체 표본"], key="표본선택", required=True,
+                             help="조건부 표본은 선박 규모·작업량 구성 차이를 줄이기 위한 보조 비교입니다 (EDA 노트북의 두 기준). "
+                                  + " · ".join(f"{kpi.조건부이름[k]}: {kpi.조건부상세[k]}" for k in kpi.조건부기준들))
+    조건부 = 표본키.get(st.session_state["표본선택"])
+    if 조건부:
+        st.caption(kpi.조건부상세[조건부])
+    return 조건부, st.session_state.get("기상변수선택")
 
 
 def 보정모형(KPI: str = "KPI1"):
@@ -269,7 +274,7 @@ def KPI1화면() -> dict | None:
     기준이름, 비교이름 = f"{기준구간} {정보['단위']}", f"{비교구간} {정보['단위']}"
     범위 = kpi.거르기(KPI1표, 기간값, 터미널, 조건부)
     통합 = kpi.KPI1통합(범위, 변수, 비교구간)
-    표본글 = kpi.조건부설명 if 조건부 else "전체 표본"
+    표본글 = kpi.조건부설명[조건부] if 조건부 else "전체 표본"
     모형 = 보정모형()
     전체범위 = kpi.거르기(KPI1표, 기간값, None, 조건부)
     차이 = kpi.KPI1차이표(전체범위, 변수, 비교구간)
@@ -358,7 +363,7 @@ def KPI2화면() -> None:
         자료없음("KPI2")
         return
     조건부, _ = 표본조절(False)
-    표본글 = kpi.조건부설명 if 조건부 else "전체 표본"
+    표본글 = kpi.조건부설명[조건부] if 조건부 else "전체 표본"
     범위 = kpi.거르기(KPI2표, 기간값, 터미널, 조건부)
     통합 = kpi.KPI2통합(범위)
     모형 = 보정모형("KPI2")
@@ -391,11 +396,12 @@ def KPI2화면() -> None:
         지도칸()
 
     전체차이 = kpi.KPI2차이표(kpi.거르기(KPI2표, 기간값))
-    조건부차이 = kpi.KPI2차이표(kpi.거르기(KPI2표, 기간값, None, True))
+    비교조건 = 조건부 or kpi.기본조건부      # 전체 표본을 보고 있어도 그래프에는 조건부 막대를 함께 그린다
+    조건부차이 = kpi.KPI2차이표(kpi.거르기(KPI2표, 기간값, None, 비교조건))
     좌, 우 = st.columns([2, 1], gap="small")
     with 좌:
         with ui.패널("k2a", "단순 차이와 회귀 보정의 KPI 2",
-                    f"전체 표본 · 조건부 표본({kpi.조건부설명}) 중앙값 차이와, GT·작업량·기상을 맞춘 회귀 보정값 · 빗금은 10건 미만"):
+                    f"전체 표본 · 조건부 표본({kpi.조건부설명[비교조건]}) 중앙값 차이와, GT·작업량·기상을 맞춘 회귀 보정값 · 빗금은 10건 미만"):
             if 보정 is not None:
                 st.plotly_chart(charts.보정비교막대([
                     {"이름": "전체 표본 중앙값 차이", "표": 전체차이, "값열": "차이", "색": charts.전체색, "적음열": "표본적음",
@@ -600,7 +606,7 @@ def _기록(표: pd.DataFrame) -> list[dict]:
 
 def AI요약자료(화면자료: dict | None = None) -> list | dict:
     """현재 화면의 집계 결과 (AI 요약 입력). 자료가 없으면 빈 목록 → 버튼 비활성."""
-    조건부 = st.session_state.get("표본선택", "조건부 표본") == "조건부 표본"
+    조건부 = 표본키.get(st.session_state.get("표본선택", kpi.조건부이름[kpi.기본조건부]))
     if 제목 == "전체 요약" and 있음["KPI2"]:
         범위 = kpi.거르기(KPI2표, 기간값, 터미널)
         k2 = kpi.KPI2통합(범위)
@@ -612,7 +618,7 @@ def AI요약자료(화면자료: dict | None = None) -> list | dict:
         정보 = kpi.기상구간[변수]
         기준구간, 비교구간 = kpi.기준비교(변수, st.session_state.get(f"비교구간_{변수}"))
         return {"기상변수": 정보["설명"], "기준구간": f"{기준구간} {정보['단위']}",
-                "비교구간": f"{비교구간} {정보['단위']}", "표본": kpi.조건부설명 if 조건부 else "전체 표본",
+                "비교구간": f"{비교구간} {정보['단위']}", "표본": kpi.조건부설명[조건부] if 조건부 else "전체 표본",
                 "월 선택 비교 그래프": {
                     "월": 월글(화면자료["월들"] or list(range(1, 13))),
                     "단순 차이": _기록(화면자료["월차이"]),
@@ -627,7 +633,7 @@ def AI요약자료(화면자료: dict | None = None) -> list | dict:
                 "보정 모형": f"M4_time — {보정모형()[0].설명}" if 보정모형() else "모형 없음"}
     if 제목 == "KPI 2" and 있음["KPI2"]:
         return {"전체 표본 터미널별": _기록(kpi.KPI2차이표(kpi.거르기(KPI2표, 기간값))),
-                f"조건부 표본({kpi.조건부설명}) 터미널별": _기록(kpi.KPI2차이표(kpi.거르기(KPI2표, 기간값, None, True))),
+                f"조건부 표본({kpi.조건부설명[조건부 or kpi.기본조건부]}) 터미널별": _기록(kpi.KPI2차이표(kpi.거르기(KPI2표, 기간값, None, 조건부 or kpi.기본조건부))),
                 "터미널별 회귀 보정 효과(시간, 95% CI, p값)": _기록(models.특보효과(보정모형("KPI2")[0])) if 보정모형("KPI2") else "모형 없음",
                 "보정 모형": f"모형 4 + 월·요일·연도추세 — {보정모형('KPI2')[0].설명}" if 보정모형("KPI2") else "모형 없음"}
     if 제목 == "기상 상황 점검" and 화면자료:
@@ -648,6 +654,6 @@ with 요약자리:
         "기간": "전체 적합기간 (2021~2024)" if 제목 == "기상 상황 점검" else 기간값,
         "터미널": 화면자료["대상"] if 제목 == "기상 상황 점검" and 화면자료 else 터미널 or "전체 터미널",
         "정의": "체류시간=터미널 출항-접안(시간). 단순 차이는 집단 중앙값 차이, 회귀 보정은 조건부 평균 차이이며 인과적 지연시간이 아님. 10건 미만은 표본 적음.",
-        "조건부 표본 기준": kpi.조건부상세,
+        "조건부 표본 기준": kpi.조건부상세[표본키.get(st.session_state.get("표본선택"), kpi.기본조건부)],
         "분석결과": AI요약자료(화면자료),
     })

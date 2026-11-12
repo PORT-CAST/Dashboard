@@ -24,15 +24,32 @@ class AnalysisTests(unittest.TestCase):
             "GT": [5000, 9999, 10000, 4999, 100000, 149999, 150000, 99999, 5000],
             "작업량": [400, 600, 500, 500, 2000, 2500, 2200, 2200, 500],
         })
-        self.assertEqual(kpi.거르기(table, 조건부=True).index.tolist(), [0, 1, 4, 5])
+        self.assertEqual(kpi.거르기(table, 조건부="항만별").index.tolist(), [0, 1, 4, 5])
+        common = pd.DataFrame({
+            "터미널": ["BPT_S", "PNC", "HPNT", "BNCT", "unknown"],
+            "GT": [10000, 19999, 20000, 15000, 15000],
+            "작업량": [600, 800, 700, 801, 700],
+        })
+        self.assertEqual(kpi.거르기(common, 조건부="공통").index.tolist(), [0, 1])
+        self.assertEqual(len(kpi.거르기(common)), 5)
 
     def test_port_cohort_matches_late_eda(self):
         for table in kpi.불러오기():
-            sample = kpi.거르기(table, 조건부=True)
+            sample = kpi.거르기(table, 조건부="항만별")
             self.assertEqual(len(sample), 5395)
             self.assertEqual(sample.groupby("터미널").size().to_dict(), {
                 "BNCT": 176, "HPNT": 119, "PNC": 108,
                 "PNIT": 93, "BPTC_G": 1478, "BPT_S": 3421,
+            })
+
+    def test_common_cohort_matches_early_eda(self):
+        """노트북 앞부분: 6개 터미널 공통 GT 1만~2만 미만·작업량 600~800 (887건, 터미널별 47~280건)."""
+        for table in kpi.불러오기():
+            sample = kpi.거르기(table, 조건부="공통")
+            self.assertEqual(len(sample), 887)
+            self.assertEqual(sample.groupby("터미널").size().to_dict(), {
+                "BNCT": 126, "HPNT": 47, "PNC": 130,
+                "PNIT": 54, "BPTC_G": 250, "BPT_S": 280,
             })
 
     def test_weather_bin_boundaries(self):
@@ -130,6 +147,27 @@ class ScreenTests(unittest.TestCase):
             self.app.session_state["기상변수선택"] = variable
             self.app.run()
             self.assertFalse(self.app.exception, variable)
+
+    def _tiles(self):
+        return " ".join(m.value for m in self.app.markdown if "tile" in m.value)
+
+    def test_default_sample_matches_presentation_numbers(self):
+        """첫 화면 기본값(6개 터미널 공통)에서 발표 대본 숫자가 그대로 나온다."""
+        self.app.button(key="메뉴_KPI 1").click().run()
+        self.assertFalse(self.app.exception)
+        self.assertEqual(self.app.session_state["표본선택"], "6개 터미널 공통")
+        self.assertIn("+4.0h", self._tiles())
+        self.assertIn("+3.8~+6.1h", self._tiles())
+        self.app.button(key="메뉴_KPI 2").click().run()
+        self.assertIn("+1.8h", self._tiles())
+        self.assertIn("+0.2~+1.1h", self._tiles())
+        self.app.session_state["표본선택"] = "항만별"
+        self.app.run()
+        self.assertFalse(self.app.exception)
+        self.assertIn("+1.5h", self._tiles())
+        self.app.session_state["표본선택"] = "전체 표본"
+        self.app.run()
+        self.assertFalse(self.app.exception)
 
     def test_return_to_check_keeps_settings(self):
         """다른 화면에 다녀와도 오류 없이 마지막 설정이 유지된다."""
